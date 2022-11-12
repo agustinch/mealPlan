@@ -17,6 +17,8 @@ model User {
   created_at      DateTime          @default(now()) @db.Timestamp()
   FoodUserStock   FoodUserStock[]
   MealTransaction MealTransaction[]
+  UserPlate       UserPlate[]
+  MealSchedule    MealSchedule[]
 
   @@map("user")
 }
@@ -35,19 +37,28 @@ model Food {
   unit            Unit              @relation(fields: [unit_id], references: [id])
   unit_id         Int
   image           String
-  Food_Plate      FoodPlate[]
+  platos          FoodPlate[]
   MealTransaction MealTransaction[]
   FoodUserStock   FoodUserStock[]
+  MealSchedule    MealSchedule[]
 
   @@map("food")
+}
+
+enum PlateType {
+  CUSTOM
+  DEFAULT
 }
 
 model Plate {
   id              Int               @id @default(autoincrement())
   name            String
   image           String
-  FoodPlate       FoodPlate[]
+  type            PlateType         @default(CUSTOM)
+  ingredientes    FoodPlate[]
   MealTransaction MealTransaction[]
+  UserPlate       UserPlate[]
+  MealSchedule    MealSchedule[]
 
   @@map("plate")
 }
@@ -86,4 +97,27 @@ model FoodUserStock {
 
   @@unique([food_id, user_id])
   @@map("food_user_stock")
+}
+
+model UserPlate {
+  Plate    Plate @relation(fields: [plate_id], references: [id])
+  plate_id Int
+  User     User  @relation(fields: [user_id], references: [id])
+  user_id  Int
+
+  @@unique([plate_id, user_id])
+  @@map("user_plate")
+}
+
+model MealSchedule {
+  id       Int      @id @default(autoincrement())
+  Plate    Plate    @relation(fields: [plate_id], references: [id])
+  Food     Food     @relation(fields: [food_id], references: [id])
+  User     User     @relation(fields: [user_id], references: [id])
+  date     DateTime
+  plate_id Int
+  food_id  Int
+  user_id  Int
+
+  @@map("meal_schedule")
 }
