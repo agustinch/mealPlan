@@ -25,7 +25,9 @@ export class PlateService {
 
   findAll() {
     return this.prisma.plate.findMany({
-      include: { ingredientes: { include: { food: true } } },
+      include: {
+        ingredientes: { include: { food: { include: { unit: true } } } },
+      },
     });
   }
 

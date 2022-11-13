@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import Head from "next/head";
 import Image from "next/image";
@@ -21,7 +22,7 @@ import styles from "../../styles/Home.module.css";
 export default function Home() {
   return (
     <Container>
-      <Grid container>
+      <Grid container justifyContent="center">
         <Grid item xs={12} md={6}>
           <List>
             <ListItem
@@ -53,6 +54,14 @@ export default function Home() {
               }
             >
               <ListItemText primary="Milanesas" />
+            </ListItem>
+            <ListItem>
+              <TextField
+                id="outlined-basic"
+                label="Food name and enter..."
+                fullWidth
+                variant="standard"
+              />
             </ListItem>
           </List>
         </Grid>

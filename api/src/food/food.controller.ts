@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FoodService } from './food.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
@@ -15,6 +23,19 @@ export class FoodController {
   @Get()
   findAll() {
     return this.foodService.findAll();
+  }
+
+  @Get('/user/:id')
+  async findAllByUser(@Param('id') id: string) {
+    const foods = await this.foodService.findAllFoodByUser(+id);
+
+    return foods.map((f) => ({
+      id: f.food_id,
+      name: f.Food.name,
+      image: f.Food.image,
+      amount: f.amount,
+      unit: f.Food.unit,
+    }));
   }
 
   @Get(':id')

@@ -21,8 +21,18 @@ export class PlateController {
   }
 
   @Get()
-  findAll() {
-    return this.plateService.findAll();
+  async findAll() {
+    const plates = await this.plateService.findAll();
+
+    return plates.map((p) => ({
+      id: p.id,
+      name: p.name,
+      image: p.image,
+      ingredientes: p.ingredientes.map((f) => ({
+        ...f.food,
+        amount: f.amount,
+      })),
+    }));
   }
 
   @Get(':id')

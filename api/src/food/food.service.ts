@@ -9,7 +9,16 @@ export class FoodService {
   constructor(private prisma: PrismaService) {}
 
   create(createFoodDto: CreateFoodDto) {
-    return this.prisma.food.create({ data: createFoodDto });
+    const { unit_id, user_id, amount, ...createFood } = createFoodDto;
+    return this.prisma.food.create({
+      data: {
+        unit: { connect: { id: unit_id } },
+        ...(user_id && {
+          FoodUserStock: { create: { user_id, amount: amount || 0 } },
+        }),
+        ...createFood,
+      },
+    });
   }
 
   findAll() {
@@ -22,11 +31,21 @@ export class FoodService {
     });
   }
 
+  findAllFoodByUser(user_id: number) {
+    return this.prisma.foodUserStock.findMany({
+      where: { user_id },
+      include: { Food: { include: { unit: true } } },
+    });
+  }
+
   update(id: number, updateFoodDto: UpdateFoodDto) {
-    return `This action updates a #${id} food`;
+    return this.prisma.food.update({
+      where: { id },
+      data: updateFoodDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} food`;
+    return this.prisma.food.delete({ where: { id } });
   }
 }
