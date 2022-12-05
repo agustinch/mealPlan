@@ -1,9 +1,11 @@
 import {
+  CalendarMonth,
   ChevronLeft,
   ChevronRight,
   Inbox,
   Mail,
   Menu,
+  Restaurant,
   Store,
 } from "@mui/icons-material";
 import {
@@ -28,7 +30,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/Home.module.css";
 
 const drawerWidth = 240;
@@ -70,9 +72,21 @@ interface Props {
 const navRoutes = [
   {
     id: 1,
-    title: "Almacen",
-    link: "/almacen",
+    title: "Food",
+    link: "/food",
     icon: <Store />,
+  },
+  {
+    id: 1,
+    title: "Plate",
+    link: "/plates",
+    icon: <Restaurant />,
+  },
+  {
+    id: 1,
+    title: "Schedules",
+    link: "/schedules",
+    icon: <CalendarMonth />,
   },
 ];
 

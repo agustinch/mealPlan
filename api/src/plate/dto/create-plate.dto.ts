@@ -1,7 +1,8 @@
-import { Food, FoodPlate } from '@prisma/client';
+import { Food } from '@prisma/client';
 
 export class CreatePlateDto {
   name: string;
   image: string;
-  ingredientes: { id: number; amount: number }[];
+  user_id: number;
+  ingredients: { id: number; amount: number }[];
 }

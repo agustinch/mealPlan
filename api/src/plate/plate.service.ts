@@ -8,17 +8,21 @@ export class PlateService {
   constructor(private prisma: PrismaService) {}
 
   create(createPlateDto: CreatePlateDto) {
+    const { user_id, ingredients, ...createPlate } = createPlateDto;
     return this.prisma.plate.create({
       data: {
-        ...createPlateDto,
-        ingredientes: {
+        ...createPlate,
+        image: '',
+        FoodUserPlate: {
           createMany: {
-            data: createPlateDto.ingredientes.map((f) => ({
+            data: ingredients.map((f) => ({
               food_id: f.id,
+              user_id: user_id,
               amount: f.amount,
             })),
           },
         },
+        User: { connect: { id: user_id } },
       },
     });
   }
@@ -26,7 +30,9 @@ export class PlateService {
   findAll() {
     return this.prisma.plate.findMany({
       include: {
-        ingredientes: { include: { food: { include: { unit: true } } } },
+        FoodUserPlate: {
+          include: { FoodUserStock: { include: { Unit: true, Food: true } } },
+        },
       },
     });
   }
@@ -40,6 +46,15 @@ export class PlateService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} plate`;
+    const deleteFoodPlate = this.prisma.foodUserPlate.deleteMany({
+      where: {
+        plate_id: id,
+      },
+    });
+
+    const deletePlate = this.prisma.plate.delete({
+      where: { id },
+    });
+    return this.prisma.$transaction([deleteFoodPlate, deletePlate]);
   }
 }
