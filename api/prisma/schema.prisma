@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "linux-musl", "linux-arm64-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BlackListToken {
+  id     Int      @id @default(autoincrement())
+  uuid   String
+  due_at DateTime
+
+  @@map("black_list_token")
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  password        String?
+  name            String?
+  created_at      DateTime          @default(now()) @db.Timestamp()
+  FoodUserStock   FoodUserStock[]
+  Plate           Plate[]
+  MealTransaction MealTransaction[]
+  MealSchedule    MealSchedule[]
+
+  @@map("user")
+}
+
+model Unit {
+  id            Int             @id @default(autoincrement())
+  name          String
+  abbreviation  String
+  FoodUserStock FoodUserStock[]
+
+  @@map("unit")
+}
+
+model Food {
+  id              Int               @id @default(autoincrement())
+  name            String
+  image           String?
+  MealTransaction MealTransaction[]
+  FoodUserStock   FoodUserStock[]
+
+  @@map("food")
+}
+
+enum PlateType {
+  CUSTOM
+  DEFAULT
+}
+
+model Plate {
+  id              Int               @id @default(autoincrement())
+  name            String
+  image           String
+  type            PlateType         @default(CUSTOM)
+  FoodUserPlate   FoodUserPlate[]
+  MealTransaction MealTransaction[]
+  MealSchedule    MealSchedule[]
+  User            User              @relation(fields: [user_id], references: [id])
+  user_id         Int
+
+  @@map("plate")
+}
+
+model FoodUserPlate {
+  Plate         Plate         @relation(fields: [plate_id], references: [id])
+  FoodUserStock FoodUserStock @relation(fields: [food_id, user_id], references: [food_id, user_id])
+  plate_id      Int
+  food_id       Int
+  user_id       Int
+  amount        Int
+
+  @@unique([plate_id, food_id])
+  @@map("food_user_plate")
+}
+
+model MealTransaction {
+  id         Int      @id @default(autoincrement())
+  food       Food     @relation(fields: [food_id], references: [id])
+  food_id    Int
+  plate      Plate    @relation(fields: [plate_id], references: [id])
+  plate_id   Int
+  amount     Float
+  created_at DateTime @default(now()) @db.Timestamp()
+  User       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+
+  @@map("meal_transaction")
+}
+
+model FoodUserStock {
+  Food                        Food            @relation(fields: [food_id], references: [id])
+  food_id                     Int
+  User                        User            @relation(fields: [user_id], references: [id])
+  user_id                     Int
+  Unit                        Unit            @relation(fields: [unit_id], references: [id])
+  unit_id                     Int
+  fridge_amount               Float           @default(0)
+  show_on_list                Boolean
+  order                       Int             @default(0)
+  FoodUserPlate               FoodUserPlate[]
+  frozen_amount               Int?
+  frozen_quantity_per_package Int?
+  allow_use_frozen_amount     Boolean         @default(false)
+
+  @@unique([food_id, user_id])
+  @@map("food_user_stock")
+}
+
+model MealSchedule {
+  id       Int      @id @default(autoincrement())
+  Plate    Plate    @relation(fields: [plate_id], references: [id])
+  User     User     @relation(fields: [user_id], references: [id])
+  date     DateTime
+  plate_id Int
+  user_id  Int
+  state    State    @relation(fields: [state_id], references: [id])
+  state_id Int      @default(1)
+
+  @@map("meal_schedule")
+}
+
+enum StateType {
+  MEAL_SCHEDULE
+}
+
+model State {
+  id           Int            @id @default(autoincrement())
+  name         String
+  type         StateType
+  MealSchedule MealSchedule[]
+
+  @@map("state")
+}
