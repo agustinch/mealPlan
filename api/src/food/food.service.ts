@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import {
@@ -13,7 +13,16 @@ export class FoodService {
   constructor(private prisma: PrismaService) {}
 
   create(createFoodDto: CreateFoodDto) {
-    const { unit_id, user_id, amount, order, ...createFood } = createFoodDto;
+    const {
+      unit_id,
+      user_id,
+      fridge_amount,
+      frozen_amount = null,
+      frozen_quantity_per_package = null,
+      allow_use_frozen_amount,
+      order,
+      ...createFood
+    } = createFoodDto;
     return this.prisma.foodUserStock.create({
       data: {
         Food: {
@@ -26,7 +35,10 @@ export class FoodService {
         },
         Unit: { connect: { id: unit_id } },
         User: { connect: { id: user_id } },
-        amount: amount || 0,
+        fridge_amount: fridge_amount || 0,
+        frozen_amount,
+        frozen_quantity_per_package,
+        allow_use_frozen_amount,
         show_on_list: true,
         order,
       },
@@ -55,16 +67,66 @@ export class FoodService {
     return this.prisma.food.findMany();
   }
 
-  updateAmount(
+  addFood(
     food_id: number,
     user_id: number,
     updateFoodStockAmount: UpdateFoodStockAmount,
   ) {
-    const { amount } = updateFoodStockAmount;
+    const { fridge_amount, frozen_amount } = updateFoodStockAmount;
+
     return this.prisma.foodUserStock.update({
       where: { food_id_user_id: { food_id, user_id } },
       data: {
-        amount,
+        ...(fridge_amount > 0 && {
+          fridge_amount: { increment: fridge_amount },
+        }),
+        ...(frozen_amount > 0 && {
+          frozen_amount: { increment: frozen_amount },
+        }),
+      },
+    });
+  }
+
+  async defrozenFood(
+    food_id: number,
+    user_id: number,
+    updateFoodStockAmount: { frozen_amount: number },
+  ) {
+    const { frozen_amount } = updateFoodStockAmount;
+    const result = await this.prisma.foodUserStock.findUnique({
+      where: { food_id_user_id: { food_id, user_id } },
+    });
+
+    if (result.frozen_amount < frozen_amount)
+      throw new BadRequestException('No hay suficiente cantidad congelada');
+
+    return this.prisma.foodUserStock.update({
+      where: { food_id_user_id: { food_id, user_id } },
+      data: {
+        fridge_amount: {
+          increment: frozen_amount,
+        },
+        frozen_amount: {
+          decrement: frozen_amount,
+        },
+      },
+    });
+  }
+
+  updateFoodStock(food_id: number, user_id: number, updateFood: UpdateFoodDto) {
+    const {
+      fridge_amount,
+      frozen_amount = null,
+      unit_id,
+      frozen_quantity_per_package,
+    } = updateFood;
+    return this.prisma.foodUserStock.update({
+      where: { food_id_user_id: { food_id, user_id } },
+      data: {
+        fridge_amount,
+        ...(frozen_amount !== null && { frozen_amount }),
+        unit_id,
+        frozen_quantity_per_package,
       },
     });
   }
@@ -74,11 +136,23 @@ export class FoodService {
     user_id: number,
     updateFoodStockShowList: UpdateFoodStockShowList,
   ) {
+    const {
+      fridge_amount,
+      frozen_amount = null,
+      unit_id,
+      frozen_quantity_per_package,
+      show_on_list,
+      order,
+    } = updateFoodStockShowList;
     return this.prisma.foodUserStock.update({
       where: { food_id_user_id: { food_id, user_id } },
       data: {
-        show_on_list: updateFoodStockShowList.show_on_list,
-        order: updateFoodStockShowList.order,
+        fridge_amount,
+        frozen_amount,
+        unit_id,
+        frozen_quantity_per_package,
+        show_on_list,
+        order,
       },
     });
   }

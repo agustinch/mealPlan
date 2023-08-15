@@ -1,13 +1,9 @@
-import { GStatesType } from "../constants";
+import { GStatesType } from '../constants';
 
 export interface IFood {
   id: number;
   name: string;
   image: string;
-  unit_id?: number;
-  amount: number;
-  Unit: IUnit;
-  show_on_list: boolean;
 }
 
 export interface IUnit {
@@ -25,19 +21,25 @@ export interface IPlate {
 
 export interface IFoodPlate {
   amount: number;
-  FoodStock: IFood;
+  FoodStock: IFoodStock;
 }
 
 export interface IFoodStock {
-  amount: number;
   Food: IFood;
+  Unit: IUnit;
+  frozen_amount: number | null;
+  fridge_amount: number | null;
+  frozen_quantity_per_package: number | null;
+  allow_use_frozen_amount: boolean;
+  show_on_list: boolean;
 }
 
 export interface IMealSchedule {
   id: number;
   Plate: IPlate;
-  date: Date;
+  date: string;
   missing: (IFoodPlate & { missingAmount: number })[];
+  frozen: (IFoodPlate & { frozenAmount: number })[];
   state: IState;
 }
 

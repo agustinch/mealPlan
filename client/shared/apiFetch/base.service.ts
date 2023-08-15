@@ -1,5 +1,6 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { Router } from "next/router";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Router } from 'next/router';
+import { ErrorResponse } from '.';
 
 interface OriginalRequest extends AxiosRequestConfig {
   retry?: boolean;
@@ -8,7 +9,8 @@ interface OriginalRequest extends AxiosRequestConfig {
 export const apiInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
+    'Client-Location': Intl.DateTimeFormat().resolvedOptions().timeZone,
   },
   withCredentials: true,
 });
@@ -18,7 +20,7 @@ apiInstance.interceptors.response.use(
     return response;
   },
   // eslint-disable-next-line consistent-return
-  async (error: AxiosError): Promise<AxiosResponse<any>> => {
+  async (error: AxiosError<ErrorResponse>): Promise<AxiosResponse<any>> => {
     const originalRequest: OriginalRequest | undefined = error.config || {};
     if (error.response?.status === 401 && !originalRequest?.retry) {
       originalRequest.retry = true;
@@ -33,9 +35,9 @@ apiInstance.interceptors.response.use(
         return apiInstance(originalRequest);
       } catch {
         originalRequest.retry = false;
-        if (window) window.location.href = "/login";
+        if (window) window.location.href = '/login';
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(error.response);
   }
 );

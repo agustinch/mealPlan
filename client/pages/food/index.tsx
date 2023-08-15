@@ -1,81 +1,38 @@
+import { Delete, Edit } from '@mui/icons-material';
 import {
-  ArrowBack,
-  Delete,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  Remove,
-} from "@mui/icons-material";
-import {
-  Autocomplete,
-  Avatar,
   Box,
+  Button,
   Container,
   Grid,
   IconButton,
-  InputAdornment,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
-  MenuItem,
-  Select,
-  TextField,
   Typography,
-} from "@mui/material";
-import _ from "lodash";
-import Head from "next/head";
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "react-query";
-import apiFetch from "../../shared/apiFetch";
-import CreatableInput, {
-  CreatableInputOption,
-} from "../../shared/components/CreatableInput";
-import AuthCheck from "../../shared/utils/AuthCheck";
-import withAuth from "../../shared/utils/AuthCheck";
-import styles from "../../styles/Home.module.css";
-import { IFood, IUnit } from "@global/entities";
+} from '@mui/material';
+import _ from 'lodash';
+import { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import apiFetch from '../../shared/apiFetch';
+import AuthCheck from '../../shared/utils/AuthCheck';
+import { IFoodStock } from '@global/entities';
+import AddUpdateFoodForm from './addUpdateFoodForm';
 
 export const Food = () => {
-  const { data: food } = useQuery<IFood[]>("food", () => apiFetch.get("/food"));
-  const { data: units } = useQuery<IUnit[]>("units", () =>
-    apiFetch.get("/food/units")
+  const { data: food } = useQuery<IFoodStock[]>('food', () =>
+    apiFetch.get('/food')
   );
-  const { data: foodSuggestion } = useQuery<IFood[]>("food-suggestion", () =>
-    apiFetch.get("/food/suggestion")
-  );
-  const [foodInput, setFoodInput] = useState({ value: "", label: "" });
-  const [unitInput, setUnitInput] = useState(-1);
 
+  const [editFood, setEditFood] = useState<IFoodStock>();
+  const [isOpenFoodForm, setIsOpenFoodForm] = useState(false);
   const queryClient = useQueryClient();
-  const addFood = useMutation(
-    (food: any) => apiFetch.post("/food", { body: food }),
-    {
-      onSuccess: () => queryClient.invalidateQueries("food"),
-    }
-  );
-
-  const addFoodAmount = useMutation(
-    (food: any) =>
-      apiFetch.patch(`/food/${food.id}/amount`, {
-        body: { amount: food.amount },
-      }),
-    {
-      onSuccess: () => queryClient.invalidateQueries("food"),
-    }
-  );
 
   const deleteFood = useMutation(
     (foodId: number) => apiFetch.delete(`/food/${foodId}`),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("food");
-        queryClient.invalidateQueries("food-suggestion");
+        queryClient.invalidateQueries('food');
+        queryClient.invalidateQueries('food-suggestion');
       },
     }
   );
@@ -85,120 +42,74 @@ export const Food = () => {
     [food]
   );
 
-  const handleKeyDownFoodInput = (event: any) => {
-    if (event.key === "Enter" && foodInput.label) {
-      addFood.mutate({
-        food_id: Number(foodInput.value) || undefined,
-        name: foodInput.label,
-        unit_id: unitInput,
-        order: Number(filteredFood?.length || 0) + 1,
-      });
-      event.target.value = "";
-    }
-  };
+  const formatterAmountFoodText = (
+    fridge_amount: number | null,
+    frozen_amount: number | null,
+    unit_name: string
+  ) =>
+    frozen_amount
+      ? `Descongelado: ${fridge_amount} ${unit_name} | Congelado: ${frozen_amount} ${unit_name}`
+      : `Descongelado: ${fridge_amount} ${unit_name}`;
 
-  const filteredFoodSuggestion = useMemo(
-    () =>
-      foodSuggestion
-        ?.filter((fs) => !filteredFood?.some((f) => f.id === fs.id))
-        .map((f) => ({ value: String(f.id), label: f.name })),
-    [foodSuggestion, filteredFood]
-  );
-
-  const handleChangeCreatableInput = (
-    newValue: CreatableInputOption | string
-  ) => {
-    if (typeof newValue === "string") {
-      setFoodInput({ value: "", label: newValue });
-      return;
-    }
-    if (newValue?.isNew && newValue?.inputValue) {
-      setFoodInput({ value: "", label: newValue.inputValue });
-
-      return;
-    }
-    if (newValue?.value) {
-      setFoodInput({ value: String(newValue.value), label: newValue.label });
-      return;
-    }
-    setFoodInput({ value: "", label: "" });
-  };
   return (
     <AuthCheck>
-      <Container>
+      <Container sx={{ padding: 0 }}>
         <Typography variant="h3">Food</Typography>
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={12} textAlign="end">
+            <Button variant="contained" onClick={() => setIsOpenFoodForm(true)}>
+              Add food
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={12}>
             <List>
               {filteredFood?.map((f) => (
                 <ListItem
-                  key={f.id}
-                  secondaryAction={
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                    >
-                      <TextField
-                        size="small"
-                        type="number"
-                        defaultValue={f.amount}
-                        sx={{ width: 120 }}
-                        onBlur={(e: any) =>
-                          addFoodAmount.mutate({
-                            id: f.id,
-                            amount: Number(e.target.value),
-                          })
-                        }
-                        InputProps={{
-                          endAdornment: (
-                            <>
-                              <InputAdornment position="end">
-                                {f.Unit.abbreviation}
-                              </InputAdornment>
-                            </>
-                          ),
-                        }}
-                      />
-                      <IconButton onClick={() => deleteFood.mutate(f.id)}>
-                        <Delete />
-                      </IconButton>
-                    </Box>
-                  }
+                  key={f.Food.id}
+                  sx={{ display: 'flex', justifyContent: 'space-between' }}
                 >
-                  <ListItemText primary={f.name} />
+                  <Box>
+                    <ListItemText
+                      primary={f.Food.name}
+                      secondary={formatterAmountFoodText(
+                        f.fridge_amount,
+                        f.frozen_amount,
+                        f.Unit.abbreviation
+                      )}
+                    />
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <IconButton
+                      onClick={() => {
+                        setEditFood(f);
+                        setIsOpenFoodForm(true);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => deleteFood.mutate(f.Food.id)}>
+                      <Delete />
+                    </IconButton>
+                  </Box>
                 </ListItem>
               ))}
-
-              <ListItem>
-                <CreatableInput
-                  size="small"
-                  id="select-email"
-                  value={foodInput}
-                  label="Add new food"
-                  name="food"
-                  onKeyDown={handleKeyDownFoodInput}
-                  onChange={(e, value) => {
-                    handleChangeCreatableInput(value);
-                  }}
-                  options={filteredFoodSuggestion || []}
-                />
-                <Select
-                  size="small"
-                  labelId="units-label"
-                  id="select-units"
-                  placeholder="unit"
-                  onChange={(e: any) => setUnitInput(Number(e.target.value))}
-                  value={unitInput}
-                >
-                  {units?.map((u) => (
-                    <MenuItem value={u.id}>{u.name}</MenuItem>
-                  ))}
-                </Select>
-              </ListItem>
             </List>
           </Grid>
         </Grid>
+        <AddUpdateFoodForm
+          onOpen={() => setIsOpenFoodForm(true)}
+          onClose={() => {
+            setIsOpenFoodForm(false);
+            setEditFood(undefined);
+          }}
+          open={isOpenFoodForm}
+          foodList={filteredFood}
+          editFood={editFood}
+        />
       </Container>
     </AuthCheck>
   );

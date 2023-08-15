@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FoodModule } from './food/food.module';
@@ -8,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { MealScheduleModule } from './meal-schedule/meal-schedule.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { TimezoneMiddleware } from './middleware/timezone.middleware';
 
 @Module({
   imports: [
@@ -26,4 +32,11 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TimezoneMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}

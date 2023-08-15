@@ -7,7 +7,7 @@ import {
   Menu,
   Restaurant,
   Store,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   Box,
   Container,
@@ -24,14 +24,14 @@ import {
   Toolbar,
   Typography,
   useTheme,
-} from "@mui/material";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+} from '@mui/material';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import React, { useState } from "react";
-import styles from "../styles/Home.module.css";
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import styles from '../styles/Home.module.css';
 
 const drawerWidth = 240;
 
@@ -40,29 +40,29 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
+  transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
+    transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
 }));
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
+  justifyContent: 'flex-end',
 }));
 
 interface Props {
@@ -72,20 +72,20 @@ interface Props {
 const navRoutes = [
   {
     id: 1,
-    title: "Food",
-    link: "/food",
+    title: 'Food',
+    link: '/food',
     icon: <Store />,
   },
   {
     id: 1,
-    title: "Plate",
-    link: "/plates",
+    title: 'Plate',
+    link: '/plates',
     icon: <Restaurant />,
   },
   {
     id: 1,
-    title: "Schedules",
-    link: "/schedules",
+    title: 'Schedules',
+    link: '/schedules',
     icon: <CalendarMonth />,
   },
 ];
@@ -103,7 +103,7 @@ export const AppMenu = ({ mainPage }: Props) => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
@@ -112,12 +112,12 @@ export const AppMenu = ({ mainPage }: Props) => {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
           >
             <Menu />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            MealFood{" "}
+            MealFood{' '}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -125,9 +125,9 @@ export const AppMenu = ({ mainPage }: Props) => {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
+          '& .MuiDrawer-paper': {
             width: drawerWidth,
-            boxSizing: "border-box",
+            boxSizing: 'border-box',
           },
         }}
         variant="temporary"
@@ -136,7 +136,7 @@ export const AppMenu = ({ mainPage }: Props) => {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? <ChevronLeft /> : <ChevronRight />}
+            {theme.direction === 'ltr' ? <ChevronLeft /> : <ChevronRight />}
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -144,7 +144,8 @@ export const AppMenu = ({ mainPage }: Props) => {
           {navRoutes.map((route, index) => (
             <Link
               href={route.link}
-              style={{ textDecoration: "none", color: "black" }}
+              onClick={() => setOpen(false)}
+              style={{ textDecoration: 'none', color: 'black' }}
               key={route.id}
             >
               <ListItem key={route.id} disablePadding>
@@ -157,7 +158,7 @@ export const AppMenu = ({ mainPage }: Props) => {
           ))}
         </List>
       </Drawer>
-      <Container sx={{ paddingY: 2 }}>
+      <Container sx={{ paddingX: 1, paddingY: 2 }}>
         <DrawerHeader />
         <div>{mainPage}</div>
       </Container>

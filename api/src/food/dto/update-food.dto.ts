@@ -4,10 +4,16 @@ import { CreateFoodDto } from './create-food.dto';
 export class UpdateFoodDto extends PartialType(CreateFoodDto) {}
 
 export interface UpdateFoodStockAmount {
-  amount: number;
+  fridge_amount: number;
+  frozen_amount: number;
 }
 
 export interface UpdateFoodStockShowList {
   show_on_list: boolean;
-  order: number;
+  fridge_amount?: number;
+  frozen_amount?: number;
+  order?: number;
+  unit_id?: number;
+  frozen_quantity_per_package?: number;
+  allow_use_frozen_amount?: boolean;
 }

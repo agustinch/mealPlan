@@ -13,6 +13,7 @@ import { FoodService } from './food.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodStockAmount, UpdateFoodDto } from './dto/update-food.dto';
 import { Public } from 'src/decorators/decorators.custom';
+import { formatFoodUserStock } from 'src/utils/formatters';
 
 @Controller('food')
 export class FoodController {
@@ -28,7 +29,7 @@ export class FoodController {
       return this.foodService.updateShowOnList(
         createFoodDto.food_id,
         req.user.id,
-        { show_on_list: true, order: createFoodDto?.order },
+        { show_on_list: true, ...createFoodDto },
       );
 
     return this.foodService.create({ ...createFoodDto, user_id: req.user.id });
@@ -38,15 +39,7 @@ export class FoodController {
   async findAllFoodStockByUser(@Req() req) {
     const foods = await this.foodService.findAllFoodStockByUser(req.user.id);
 
-    return foods.map((f) => ({
-      id: f.food_id,
-      name: f.Food.name,
-      image: f.Food.image,
-      amount: f.amount,
-      Unit: f.Unit,
-      show_on_list: f.show_on_list,
-      order: f.order,
-    }));
+    return foods.map((f) => formatFoodUserStock(f));
   }
 
   @Get('/suggestion')
@@ -64,16 +57,46 @@ export class FoodController {
     return this.foodService.findAllUnits();
   }
 
-  @Patch('/:food_id/amount')
-  updateAmount(
+  @Patch('/:food_id')
+  update(
     @Req() req,
     @Param('food_id') food_id: string,
-    @Body() updateAmount: UpdateFoodStockAmount,
+    @Body() updateFood: UpdateFoodDto,
   ) {
-    if (updateAmount.amount < 0)
+    if (
+      updateFood.fridge_amount < 0 ||
+      (updateFood.frozen_amount !== null && updateFood.frozen_amount < 0)
+    )
       throw new BadRequestException('El monto no puede ser menor de 0');
 
-    return this.foodService.updateAmount(+food_id, req.user.id, updateAmount);
+    return this.foodService.updateFoodStock(+food_id, req.user.id, updateFood);
+  }
+
+  @Patch('/:food_id/add')
+  addFood(
+    @Req() req,
+    @Param('food_id') food_id: string,
+    @Body() updateFood: UpdateFoodStockAmount,
+  ) {
+    if (
+      (updateFood.fridge_amount && updateFood.fridge_amount < 0) ||
+      (updateFood.frozen_amount && updateFood.frozen_amount < 0)
+    )
+      throw new BadRequestException('El monto no puede ser menor o igual a 0');
+
+    return this.foodService.addFood(+food_id, req.user.id, updateFood);
+  }
+
+  @Patch('/:food_id/defrozen')
+  defrozenFood(
+    @Req() req,
+    @Param('food_id') food_id: string,
+    @Body() updateFood: { frozen_amount: number },
+  ) {
+    if (updateFood.frozen_amount && updateFood.frozen_amount < 0)
+      throw new BadRequestException('El monto no puede ser menor o igual a 0');
+
+    return this.foodService.defrozenFood(+food_id, req.user.id, updateFood);
   }
 
   @Delete(':food_id')

@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 services:
   dba:
     image: postgres:15.0-alpine
@@ -6,10 +6,42 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=develop
+      - POSTGRES_HOST=127.0.0.1
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+      target: development
+    volumes:
+      - ./api:/usr/src/app/api
+      - /usr/src/app/api/node_modules
+    ports:
+      - 3000:3000
+    command: yarn start:migrate:dev
+    env_file:
+      - ./api/.env
+    depends_on:
+      - dba
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      target: development
+    volumes:
+      - ./client:/usr/src/app/client
+      - /usr/src/app/client/node_modules
+    ports:
+      - 5000:5000
+    command: yarn dev
+    env_file:
+      - ./client/.env
+    depends_on:
+      - api
 volumes:
   db:
     driver: local
