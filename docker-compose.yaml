@@ -13,8 +13,6 @@ services:
     command: yarn start:migrate:dev
     env_file:
       - ./api/.env
-    depends_on:
-      - dba
   client:
     build:
       context: .
