@@ -10,7 +10,7 @@ services:
       - /usr/src/app/api/node_modules
     ports:
       - 3000:3000
-    command: yarn start:migrate:dev
+    command: yarn start
     env_file:
       - ./api/.env
   client:
@@ -23,7 +23,7 @@ services:
       - /usr/src/app/client/node_modules
     ports:
       - 5000:5000
-    command: yarn dev
+    command: sh -c "yarn build && yarn start"
     env_file:
       - ./client/.env
     depends_on:
