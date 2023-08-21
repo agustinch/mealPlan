@@ -22,5 +22,7 @@ services:
       - 5000:5000
     env_file:
       - ./client/.env
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://18.231.104.17/api
     depends_on:
       - api
