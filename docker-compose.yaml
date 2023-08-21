@@ -16,7 +16,6 @@ services:
   client:
     image: agustinch/mealplan-client:latest
     volumes:
-      - ./client:/usr/src/app/client
       - /usr/src/app/client/node_modules
     ports:
       - 5000:5000
