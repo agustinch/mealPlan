@@ -12,15 +12,15 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 
 COPY ./client/package.json ./client/yarn.lock ./client/
-COPY global ./global
+COPY ./global ./global
 
-COPY ./client ./client/
+COPY ./client ./client
 
 WORKDIR /usr/src/app/client
 
 
 RUN yarn install --pure-lockfile --non-interactive  --ignore-engines --force --network-timeout 1000000000
-
+RUN yarn build
 EXPOSE 5000
 CMD ["yarn", "dev"]
 
@@ -39,14 +39,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 
 COPY ./client/package.json ./client/yarn.lock ./client/
-COPY global ./global
 
-COPY ./client ./client/
+COPY ./client ./client
 
 WORKDIR /usr/src/app/client
-RUN yarn install --pure-lockfile --non-interactive  --ignore-engines --force --network-timeout 1000000000
 
-RUN yarn build
+COPY --from=development /usr/src/app/client/.next ./.next
 
 EXPOSE 5000
 
