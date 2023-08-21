@@ -33,11 +33,22 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
 
-COPY ./api/package.json ./api/package.json
-COPY global ./global
+# Copy package.json and yarn.lock to the container
+COPY ./api/package.json ./api/yarn.lock ./api/
+COPY ./global ./global
 
-RUN yarn --production
-
+# Copy the rest of the application code to the container
 COPY ./api ./api/
 
-CMD ["node", "dist/src/main"]
+WORKDIR /usr/src/app/api
+
+RUN yarn install
+
+# Build the NestJS application
+RUN yarn build
+
+# Expose the port your NestJS app is listening on
+EXPOSE 5000
+
+# Command to start your NestJS app
+CMD ["yarn", "start:prod"]
