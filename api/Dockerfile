@@ -40,6 +40,6 @@ RUN yarn --production
 
 COPY ./api ./api
 
-COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/api/dist ./dist
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]

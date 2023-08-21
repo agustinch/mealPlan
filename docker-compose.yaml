@@ -4,27 +4,27 @@ services:
     build:
       context: .
       dockerfile: ./api/Dockerfile
-      target: development
+      target: production
     volumes:
       - ./api:/usr/src/app/api
       - /usr/src/app/api/node_modules
     ports:
       - 3000:3000
-    command: sh -c "yarn build && yarn start"
     env_file:
       - ./api/.env
+    command: yarn start
   client:
     build:
       context: .
       dockerfile: ./client/Dockerfile
-      target: development
+      target: production
     volumes:
       - ./client:/usr/src/app/client
       - /usr/src/app/client/node_modules
     ports:
       - 5000:5000
-    command: sh -c "yarn build && yarn start"
     env_file:
       - ./client/.env
     depends_on:
       - api
+    command: yarn start
