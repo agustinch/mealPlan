@@ -45,6 +45,6 @@ COPY ./client ./client/
 
 WORKDIR /usr/src/app/client
 RUN yarn install --pure-lockfile --non-interactive  --ignore-engines --force --network-timeout 1000000000
-RUN yarn build
 EXPOSE 5000
-CMD ["yarn", "start"]
+
+CMD ["yarn", "build"]
