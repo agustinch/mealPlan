@@ -42,6 +42,16 @@ services:
       - ./client/.env
     depends_on:
       - api
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+      - client
 volumes:
   db:
     driver: local

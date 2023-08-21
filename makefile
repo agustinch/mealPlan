@@ -3,6 +3,10 @@ update-globals:
 up-all:
 	docker-compose up
 
+up-all-dev:
+	docker-compose -f docker-compose-dev.yaml down
+	docker-compose -f docker-compose-dev.yaml up 
+
 dba-up:
 	docker-compose up dba
 
@@ -26,3 +30,9 @@ recreate-client:
 	docker-compose build --no-cache client 
 	docker image prune -f
 	docker-compose up
+
+recreate-nginx:
+	docker-compose -f docker-compose-dev.yaml rm -s -v -f nginx
+	docker-compose -f docker-compose-dev.yaml build --no-cache nginx 
+	docker image prune -f
+	docker-compose -f docker-compose-dev.yaml up

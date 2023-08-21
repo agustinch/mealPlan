@@ -10,6 +10,7 @@ async function bootstrap() {
     origin: ['http://localhost:5000'],
     credentials: true,
   });
+  app.setGlobalPrefix('api');
   await app.listen(3000);
 }
 bootstrap();
