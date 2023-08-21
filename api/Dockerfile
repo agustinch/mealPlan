@@ -38,8 +38,6 @@ COPY global ./global
 
 RUN yarn --production
 
-COPY ./api ./api
-
-COPY --from=development /usr/src/app/api/dist ./dist
+COPY ./api ./api/
 
 CMD ["node", "dist/src/main"]
