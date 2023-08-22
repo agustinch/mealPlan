@@ -26,8 +26,8 @@ jobs:
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker image build -t  agustinch/mealplan-api -f ./api/Dockerfile .
           docker image build -t  agustinch/mealplan-client -f ./client/Dockerfile . 
-          docker pull agustinch/mealplan-api:latest
-          docker pull agustinch/mealplan-client:latest
+          docker push agustinch/mealplan-api:latest
+          docker push agustinch/mealplan-client:latest
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master
         with:
@@ -35,8 +35,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker push agustinch/mealplan-api:latest
-            docker push agustinch/mealplan-client:latest
+            docker pull agustinch/mealplan-api:latest
+            docker pull agustinch/mealplan-client:latest
             cd ./mealPlan
             sudo su
             make up-all
