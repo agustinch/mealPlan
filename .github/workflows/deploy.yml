@@ -27,6 +27,16 @@ jobs:
           docker image build -t  agustinch/mealplan-api -f ./api/Dockerfile .
           docker image build -t  agustinch/mealplan-client -f ./client/Dockerfile . 
           docker push agustinch/mealplan-api:latest
-
-      - name: Deploy using docker-compose
-        run: make up-all
+          docker push agustinch/mealplan-client:latest
+      - name: SSH into EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            docker push agustinch/mealplan-api:latest
+            docker push agustinch/mealplan-client:latest
+            cd ./mealPlan
+            sudo su
+            make up-all
