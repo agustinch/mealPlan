@@ -35,8 +35,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker pull agustinch/mealplan-api:latest
-            docker pull agustinch/mealplan-client:latest
             cd ./mealPlan
             sudo su
+            docker pull agustinch/mealplan-api:latest
+            docker pull agustinch/mealplan-client:latest
             make up-all
