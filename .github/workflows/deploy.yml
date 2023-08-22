@@ -37,6 +37,7 @@ jobs:
           script: |
             cd ./mealPlan
             sudo su
+            docker login
             docker pull agustinch/mealplan-api:latest
             docker pull agustinch/mealplan-client:latest
             make up-all
