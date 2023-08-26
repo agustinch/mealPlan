@@ -26,7 +26,7 @@ RUN yarn prisma generate
 
 RUN yarn build
 
-FROM node:14.18-alpine as production
+FROM --platform=linux/amd64 node:14.18-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
