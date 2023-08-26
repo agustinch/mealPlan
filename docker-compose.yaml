@@ -17,6 +17,8 @@ services:
       - ./client/.env:/usr/src/app/client/.env
     ports:
       - 5000:5000
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
     depends_on:
       - api
   nginx:
