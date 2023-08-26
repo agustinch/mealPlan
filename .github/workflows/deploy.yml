@@ -36,8 +36,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             cd ./mealPlan
-            sudo su
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker pull agustinch/mealplan-api:latest
-            docker pull agustinch/mealplan-client:latest
-            make up-all
+            echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
+            sudo docker pull agustinch/mealplan-api:latest
+            sudo docker pull agustinch/mealplan-client:latest
+            sudo make up-all
