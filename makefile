@@ -1,7 +1,7 @@
 update-globals: 
 	bash update-globals.sh
 up-all:
-	docker-compose up
+	docker-compose up -d
 
 up-all-dev:
 	docker-compose -f docker-compose-dev.yaml down
