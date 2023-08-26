@@ -37,7 +37,7 @@ jobs:
           script: |
             cd ./mealPlan
             sudo su
-            docker login
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker pull agustinch/mealplan-api:latest
             docker pull agustinch/mealplan-client:latest
             make up-all
