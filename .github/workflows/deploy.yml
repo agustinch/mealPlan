@@ -17,6 +17,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
+      - name: create env file
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.DEV_NEXT_PUBLIC_API_BASE_URL }}
+        run: |
+          touch ./client/.env
+          echo NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL >> ./client/.env
       - name: Build and push Docker image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
