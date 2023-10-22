@@ -6,7 +6,7 @@ on:
       - master  # Adjust to your default branch
 
 jobs:
-  deploy:
+  building-docker-images:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +33,9 @@ jobs:
           docker image build -t  agustinch/mealplan-client -f ./client/Dockerfile . 
           docker push agustinch/mealplan-api:latest
           docker push agustinch/mealplan-client:latest
+  deploy-ec2:
+    runs-on: ubuntu-latest
+    steps:
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master
         with:
@@ -44,4 +47,4 @@ jobs:
             echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
             sudo docker pull agustinch/mealplan-api:latest
             sudo docker pull agustinch/mealplan-client:latest
-            sudo make up-all
+            sudo docker-compose up -d
