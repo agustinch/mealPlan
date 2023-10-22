@@ -34,6 +34,7 @@ jobs:
           docker push agustinch/mealplan-api:latest
           docker push agustinch/mealplan-client:latest
   deploy-ec2:
+    needs: building-docker-images
     runs-on: ubuntu-latest
     steps:
       - name: SSH into EC2 instance
