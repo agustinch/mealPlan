@@ -3,7 +3,6 @@ services:
   api:
     image: agustinch/mealplan-api:latest
     volumes:
-      - ./api:/usr/src/app/api
       - /usr/src/app/api/node_modules
     ports:
       - 3000:3000
@@ -14,11 +13,8 @@ services:
     image: agustinch/mealplan-client:latest
     volumes:
       - /usr/src/app/client/node_modules
-      - ./client/.env:/usr/src/app/client/.env
     ports:
       - 5000:5000
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
     depends_on:
       - api
   nginx:
