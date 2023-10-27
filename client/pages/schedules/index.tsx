@@ -81,7 +81,7 @@ export default function Schedules() {
       <Container>
         <Grid container justifyContent="center">
           <Grid item xs={12} md={12} py={2}>
-            <Typography variant="h3">Schedules!</Typography>
+            <Typography variant="h3">Schedules!!!</Typography>
           </Grid>
           <Grid item xs={12} md={12} textAlign="right" py={2}>
             <Button
