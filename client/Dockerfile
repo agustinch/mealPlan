@@ -41,11 +41,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 COPY ./client/package.json ./client/yarn.lock ./client/
 COPY ./global ./global
 
-COPY ./client ./client
-
 WORKDIR /usr/src/app/client
-
-RUN yarn install --ignore-engines --force --production
 
 COPY --from=development /usr/src/app/client/.next ./.next
 

@@ -3,6 +3,9 @@ update-globals:
 up-all:
 	docker-compose up -d
 
+up-all-prod:
+	docker-compose -f docker-compose-prod.yaml up -d
+
 up-all-dev:
 	docker-compose -f docker-compose-dev.yaml down
 	docker-compose -f docker-compose-dev.yaml up 
@@ -27,8 +30,8 @@ recreate-api:
 
 recreate-client:
 	docker-compose rm -s -v -f client
-	docker-compose build --no-cache client 
 	docker image prune -f
+	docker-compose build --no-cache client 
 	docker-compose up
 
 recreate-nginx:

@@ -1,20 +1,45 @@
 version: '3.8'
 services:
-  api:
-    image: agustinch/mealplan-api:latest
+  dba:
+    image: postgres:15.0-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=develop
+      - POSTGRES_HOST=127.0.0.1
+    ports:
+      - '5432:5432'
     volumes:
+      - db:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+      target: development
+    volumes:
+      - ./api:/usr/src/app/api
       - /usr/src/app/api/node_modules
     ports:
       - 3000:3000
+    command: yarn start:migrate:dev
     env_file:
       - ./api/.env
-    command: yarn start
+    depends_on:
+      - dba
   client:
-    image: agustinch/mealplan-client:latest
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      target: development
     volumes:
+      - ./client:/usr/src/app/client
       - /usr/src/app/client/node_modules
     ports:
       - 5000:5000
+    command: yarn dev
+    env_file:
+      - ./client/.env
     depends_on:
       - api
   nginx:
@@ -27,3 +52,6 @@ services:
     depends_on:
       - api
       - client
+volumes:
+  db:
+    driver: local
