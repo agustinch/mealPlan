@@ -44,6 +44,8 @@ COPY ./global ./global
 WORKDIR /usr/src/app/client
 
 COPY --from=development /usr/src/app/client/.next ./.next
+COPY --from=development /usr/src/app/client/node_modules ./node_modules
+
 
 EXPOSE 5000
 
