@@ -45,6 +45,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
+            sudo docker system prune --all --force
             sudo docker pull agustinch/mealplan-api:latest
             sudo docker pull agustinch/mealplan-client:latest
             sudo docker-compose up -d
